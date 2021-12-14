@@ -5,6 +5,7 @@ export default class UserStore {
         this._user = {};
         this._isAuth = false;
         this._isAdmin = false;
+        this._isLoading = false;
         makeAutoObservable(this);
     }
 
@@ -30,5 +31,13 @@ export default class UserStore {
 
     get isAdmin() {
         return this._isAdmin;
+    }
+
+    setIsLoading(bool) {
+        this._isLoading = bool;
+    }
+
+    get isLoading() {
+        return this._isLoading;
     }
 }

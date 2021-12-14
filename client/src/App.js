@@ -9,9 +9,10 @@ import { observer } from "mobx-react-lite";
 
 const App = () => {
     const { user } = useContext(Context);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        setIsLoading(true);
         if (localStorage.getItem("token")) {
             refresh()
                 .then((result) => {
@@ -19,13 +20,13 @@ const App = () => {
                     user.setIsAuth(true);
                     user.setUser(result.user);
                 })
-                .finally(setLoading(false));
+                .finally(setIsLoading(false));
         } else {
-            setLoading(false);
+            setIsLoading(false);
         }
-    }, []);
+    }, [user]);
 
-    if (loading) {
+    if (isLoading) {
         return <Spinner animation={"grow"} />;
     }
 
@@ -33,14 +34,15 @@ const App = () => {
         <BrowserRouter>
             <NavBar />
             <h1>
+                <strong>isAuth</strong>: {user.isAuth.toString()}
+            </h1>
+            <h1>
                 <strong>User Id</strong>: {user.user.id || "NO ID"}
             </h1>
             <h1>
                 <strong>User Email</strong>: {user.user.email || "NO EMAIL"}
             </h1>
-            <h1>
-                <strong>isAuth</strong>: {user.isAuth.toString()}
-            </h1>
+
             <h1>
                 <strong>Access Token</strong>:{" "}
                 {localStorage.getItem("token")
