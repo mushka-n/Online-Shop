@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 const $host = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
@@ -33,7 +34,7 @@ $authHost.interceptors.response.use(
                 localStorage.setItem("token", response.data.accessToken);
                 return $authHost.request(originalRequest);
             } catch (e) {
-                console.log("НЕ АВТОРИЗОВАН");
+                console.log("Not authorized");
             }
         }
         throw error;

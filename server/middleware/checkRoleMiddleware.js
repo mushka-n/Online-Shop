@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const tokenService = require("../controllers/services/tokenService");
+const ApiError = require("../error/ApiError");
 
 module.exports = function (role) {
     return function (req, res, next) {
@@ -6,18 +8,19 @@ module.exports = function (role) {
             next();
         }
         try {
-            const token = req.headers.authorization.split(" ")[1]; // Bearer asfasnfkajsfnjk
-            if (!token) {
-                return res.status(401).json({ message: "Не авторизован" });
+            const { refreshToken } = req.cookies;
+            const userData = tokenService.validateRefreshToken(refreshToken);
+
+            if (!userData) {
+                throw ApiError.UnauthorizedError();
+            } else if (userData.role !== role) {
+                throw ApiError.Forbidden();
             }
-            const decoded = jwt.verify(token, process.env.SECRET_KEY);
-            if (decoded.role !== role) {
-                return res.status(403).json({ message: "Нет доступа" });
-            }
-            req.user = decoded;
+
+            req.user = userData;
             next();
         } catch (e) {
-            res.status(401).json({ message: "Не авторизован" });
+            return res(new ApiError.InternalServerError(e.message));
         }
     };
 };

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { Token } = require("../../models/models");
+const UserDTO = require("../DTOs/userDTO");
 
 class TokenService {
     generateTokens(payload) {
@@ -50,6 +51,19 @@ class TokenService {
         } catch (e) {
             return null;
         }
+    }
+
+    saveResults(res, user) {
+        const userDTO = new UserDTO(user); // id email isActivated
+        const tokens = this.generateTokens({ ...userDTO });
+        this.saveToken(userDTO.id, tokens.refreshToken);
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+        });
+
+        return { ...tokens, user: userDTO };
     }
 }
 

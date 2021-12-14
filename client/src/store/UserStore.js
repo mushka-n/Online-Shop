@@ -4,6 +4,7 @@ export default class UserStore {
     constructor() {
         this._user = {};
         this._isAuth = false;
+        this._isAdmin = false;
         makeAutoObservable(this);
     }
 
@@ -21,5 +22,13 @@ export default class UserStore {
 
     get isAuth() {
         return this._isAuth;
+    }
+
+    setIsAdmin(bool) {
+        this._isAdmin = bool;
+    }
+
+    get isAdmin() {
+        return this._isAdmin;
     }
 }

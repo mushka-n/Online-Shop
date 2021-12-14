@@ -1,57 +1,134 @@
-const { Basket, BasketProduct, User } = require("../models/models");
+const ApiError = require("../error/ApiError");
+const {
+    Basket,
+    BasketProduct,
+    ProductVersion,
+    Product,
+} = require("../models/models");
 
 class BasketController {
-    async createBasket(req, res) {
+    // creates basket for new user
+    async createBasket(req, res, next) {
         try {
-            const userId = req.body.userId;
-            const basket = await Basket.create({ userId });
-            return res.json(basket);
+            const { userId } = req.body;
+            await Basket.create({ userId });
+            return res.send(200);
         } catch (e) {
-            res.send(e.message);
+            next(e);
         }
     }
 
-    async getBasket(req, res) {
+    // returns list of products added to the basket with extra data
+    async getBasketProducts(req, res, next) {
         try {
-            const userId = req.body.userId;
+            const { userId } = req.query;
             const basket = await Basket.findOne({ where: { userId } });
-            return res.json(basket);
-        } catch (e) {
-            res.send(e.message);
-        }
-    }
-
-    async getProducts(req, res) {
-        try {
-            const { basketId } = req.body;
-            let basketProducts = BasketProduct.findAll({
-                where: { basketId },
+            const basketProducts = await BasketProduct.findAll({
+                where: { basketId: basket.id },
             });
-            return res.json(basketProducts);
+
+            // returns all products that are added to the basket
+            const products = await Product.findAll({
+                where: { id: basketProducts.map((bp) => bp.productId) },
+            });
+
+            // returns all versions of all products that are added to the basket
+            const versions = await ProductVersion.findAll({
+                where: { id: basketProducts.map((bp) => bp.versionId) },
+            });
+
+            // returns array of products with added {amount} and {versionTitle}
+            const result = basketProducts.map((bp) => {
+                const [product] = products.filter((obj) => {
+                    return obj.id === bp.productId;
+                });
+                const [version] = versions.filter((obj) => {
+                    return obj.id === bp.versionId;
+                });
+                return {
+                    id: bp.productId,
+                    img: product.img,
+                    name: product.name,
+                    rating: product.rating,
+                    versionId: version.id,
+                    versionTitle: version.title,
+                    amount: bp.amount,
+                    addedToBasket: bp.createdAt,
+                };
+            });
+
+            return res.json(result);
         } catch (e) {
-            res.send(e.message);
+            next(e);
         }
     }
 
-    async addOneProduct(req, res) {
+    // creates BasketProduct or increases it's {amount} param
+    async addProduct(req, res, next) {
         try {
-            const { productId } = req.params;
-            const { basketId } = req.body;
+            const { userId, productId, versionId } = req.body;
+            const basket = await Basket.findOne({ where: { userId } });
+            const basketId = basket.id;
+
+            const version = await ProductVersion.findOne({
+                where: { id: versionId },
+            });
+
+            if (version.stock === 0)
+                throw ApiError.BadRequest("Товар закончился");
+            version.stock = version.stock - 1;
+            await version.save();
 
             const basketProduct = await BasketProduct.findOne({
-                where: { productId, basketId },
+                where: { basketId, productId, versionId },
             });
 
-            if (!basketProduct) {
-                basketProduct = await BasketProduct.create({
-                    productId,
+            if (basketProduct) {
+                basketProduct.amount = basketProduct.amount + 1;
+                await basketProduct.save();
+            } else {
+                await BasketProduct.create({
                     basketId,
+                    productId,
+                    versionId,
                 });
             }
 
-            return res.json(basketProduct);
+            return res.send(200);
         } catch (e) {
-            res.send(e.message);
+            next(e);
+        }
+    }
+
+    // deletes BasketProduct or lowers it's {amount} param
+    async removeProduct(req, res, next) {
+        try {
+            const { userId, productId, versionId } = req.body;
+            const basket = await Basket.findOne({ where: { userId } });
+            const basketId = basket.id;
+
+            const version = await ProductVersion.findOne({
+                where: { id: versionId },
+            });
+
+            const basketProduct = await BasketProduct.findOne({
+                where: { basketId, productId, versionId },
+            });
+
+            if (basketProduct) {
+                basketProduct.amount = basketProduct.amount - 1;
+                if (basketProduct.amount === 0) {
+                    await basketProduct.destroy();
+                }
+                await basketProduct.save();
+
+                version.stock = version.stock + 1;
+                await version.save();
+            }
+
+            return res.send(200);
+        } catch (e) {
+            next(e);
         }
     }
 }

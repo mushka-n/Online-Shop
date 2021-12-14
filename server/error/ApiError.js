@@ -24,7 +24,7 @@ module.exports = class ApiError extends Error {
         return new ApiError(403, "Нет прав доступа");
     }
 
-    static InternalServerError() {
+    static InternalServerError(message) {
         return new ApiError(500, "Непредвиденная ошибка на сервере");
     }
 };

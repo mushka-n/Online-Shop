@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const { Product, ProductInfo, ProductVersion } = require("../models/models");
 const ApiError = require("../error/ApiError");
+const productService = require("./services/productService");
 
 class ProductController {
     async create(req, res, next) {
@@ -13,11 +14,20 @@ class ProductController {
             let fileName = uuid.v4() + ".jpg";
             img.mv(path.resolve(__dirname, "..", "static", fileName));
 
+            let wholeStock = 0;
+            if (versions) {
+                versions = JSON.parse(versions);
+                versions.forEach((v) => {
+                    wholeStock += parseInt(v.stock);
+                });
+            }
+
             const product = await Product.create({
                 name,
                 price,
                 brandId,
                 typeId,
+                stock: wholeStock,
                 img: fileName,
             });
 
@@ -33,13 +43,14 @@ class ProductController {
             }
 
             if (versions) {
-                versions = JSON.parse(versions);
-                versions.forEach((v) =>
+                versions.forEach((v) => {
+                    wholeStock += parseInt(v.stock);
                     ProductVersion.create({
                         title: v.title,
+                        stock: v.stock,
                         productId: product.id,
-                    })
-                );
+                    });
+                });
             }
 
             return res.json(product);
@@ -95,63 +106,35 @@ class ProductController {
 
     // Update Single Product
     async updateOne(req, res) {
-        const id = req.params.id;
-        let { name, price, brandId, typeId, info, versions } = req.body;
-        let updatedProduct = { name, price, brandId, typeId };
+        try {
+            const id = req.params.id;
+            let { name, price, brandId, typeId, info, versions } = req.body;
+            const updatedProduct = { name, price, brandId, typeId };
 
-        // If Image Is Provided
-        if (req.files) {
-            // Add New Image To Params To Update
-            const { img } = req.files;
-            let fileName = uuid.v4() + ".jpg";
-            img.mv(path.resolve(__dirname, "..", "static", fileName));
-            updatedProduct.img = fileName;
+            // If Image Is Provided
+            if (req.files) {
+                // Add New Image To Params To Update
+                const { img } = req.files;
+                let fileName = uuid.v4() + ".jpg";
+                img.mv(path.resolve(__dirname, "..", "static", fileName));
+                updatedProduct.img = fileName;
 
-            // Destroy Old Image
-            const oldProduct = await Product.findOne({ where: { id } });
-            const oldImg = oldProduct.img;
-            let filePath = path.resolve(__dirname, "..", "static", oldImg);
-            fs.unlinkSync(filePath);
-        }
-
-        // Update Product
-        await Product.update(updatedProduct, { where: { id } });
-
-        // Destroy Old Info
-        await ProductInfo.destroy({ where: { productId: id } })
-            .then(() => {
-                // If Info Is Given Post It Into Database
-                if (info) {
-                    info = JSON.parse(info);
-
-                    info.forEach((i) =>
-                        ProductInfo.create({
-                            title: i.title,
-                            description: i.description,
-                            productId: id,
-                        })
-                    );
-                }
-
-                return res.send({ message: "all good" });
-            })
-            .catch(() => {});
-
-        await ProductVersion.destroy({ where: { productId: id } }).then(() => {
-            // If Versions Are Given Post It Into Database
-            if (versions) {
-                versions = JSON.parse(versions);
-
-                versions.forEach((v) =>
-                    ProductVersion.create({
-                        title: v.title,
-                        productId: id,
-                    })
-                );
+                // Destroy Old Image
+                const oldProduct = await Product.findOne({ where: { id } });
+                const oldImg = oldProduct.img;
+                let filePath = path.resolve(__dirname, "..", "static", oldImg);
+                fs.unlinkSync(filePath);
             }
 
-            return res.send({ message: "all good" });
-        });
+            await productService.updateInfo(id, info);
+            const stock = await productService.updateVersions(id, versions);
+            updatedProduct.stock = stock;
+            await Product.update(updatedProduct, { where: { id } });
+
+            return res.send(200);
+        } catch (e) {
+            next(e);
+        }
     }
 
     async deleteOne(req, res) {
@@ -166,7 +149,7 @@ class ProductController {
             await Product.destroy({ where: { id: id } });
             await ProductInfo.destroy({ where: { productId: id } });
             await ProductVersion.destroy({ where: { productId: id } });
-            res.send({ message: "all good" });
+            res.send(200);
         } catch (e) {
             res.send(e.message);
         }

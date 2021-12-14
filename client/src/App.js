@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { BrowserRouter } from "react-router-dom";
 import { Context } from ".";
-import AppRouter from "./components/AppRouter";
+import AppRouter from "./components/AppRouter/AppRouter";
 import NavBar from "./components/NavBar";
 import { refresh } from "./API/userAPI";
 import { observer } from "mobx-react-lite";
@@ -13,19 +13,13 @@ const App = () => {
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
-            try {
-                const response = refresh();
-                response.then((result) => {
+            refresh()
+                .then((result) => {
                     localStorage.setItem("token", result.accessToken);
-                    console.log(result);
                     user.setIsAuth(true);
                     user.setUser(result.user);
-                    setLoading(false);
-                });
-            } catch (e) {
-                console.log(e.response?.data?.message);
-                setLoading(false);
-            }
+                })
+                .finally(setLoading(false));
         } else {
             setLoading(false);
         }
