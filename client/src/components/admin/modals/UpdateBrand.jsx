@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { Dropdown, Form, Modal, Row, Button } from "react-bootstrap";
 import { Context } from "../../..";
-import { fetchBrands, updateBrand } from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for updating a Brand model
 const UpdateBrand = observer(({ show, onHide }) => {
@@ -11,11 +11,13 @@ const UpdateBrand = observer(({ show, onHide }) => {
     const [newName, setNewName] = useState("");
 
     useEffect(() => {
-        fetchBrands().then((data) => product.setBrands(data));
+        ProductAPI.fetchBrands().then((data) => product.setBrands(data));
     }, [product]);
 
     const click = () => {
-        updateBrand(product.selectedBrand.id, { name: newName }).then(() => {
+        ProductAPI.updateBrand(product.selectedBrand.id, {
+            name: newName,
+        }).then(() => {
             onHide();
         });
     };

@@ -2,11 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Dropdown, Form, Row, Col, Image } from "react-bootstrap";
 import { Context } from "../../../index";
-import {
-    createProduct,
-    fetchBrands,
-    fetchTypes,
-} from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 import { observer } from "mobx-react-lite";
 
 // Modal window for creating a new Product model
@@ -20,8 +16,8 @@ const CreateProduct = observer(({ show, onHide }) => {
     const [versions, setVersions] = useState([]);
 
     useEffect(() => {
-        fetchTypes().then((data) => product.setTypes(data));
-        fetchBrands().then((data) => product.setBrands(data));
+        ProductAPI.fetchTypes().then((data) => product.setTypes(data));
+        ProductAPI.fetchBrands().then((data) => product.setBrands(data));
     }, [product]);
 
     const add = (arr, setArr, params) => {
@@ -59,7 +55,7 @@ const CreateProduct = observer(({ show, onHide }) => {
         formData.append("info", JSON.stringify(info));
         formData.append("versions", JSON.stringify(versions));
 
-        createProduct(formData).then(() => onHide());
+        ProductAPI.createProduct(formData).then(() => onHide());
     };
 
     return (

@@ -1,77 +1,84 @@
 import { $authHost, $host } from "./index";
 
-// TYPE //
+export default class ProductAPI {
+    static async createBasket(userId) {
+        const { data } = await $host.post("api/basket/create", { userId });
+        return data;
+    }
 
-export const createType = async (type) => {
-    const { data } = await $authHost.post("api/type", type);
-    return data;
-};
+    // TYPE //
 
-export const updateType = async (id, type) => {
-    const { data } = await $authHost.patch("api/type/" + id, type);
-    return data;
-};
+    static async createType(type) {
+        const { data } = await $authHost.post("api/type", type);
+        return data;
+    }
 
-export const deleteType = async (id) => {
-    const { data } = await $authHost.delete("api/type/" + id);
-    return data;
-};
+    static async updateType(id, type) {
+        const { data } = await $authHost.patch("api/type/" + id, type);
+        return data;
+    }
 
-export const fetchTypes = async () => {
-    const { data } = await $host.get("api/type");
-    return data;
-};
+    static async deleteType(id) {
+        const { data } = await $authHost.delete("api/type/" + id);
+        return data;
+    }
 
-// BRAND //
+    static async fetchTypes() {
+        const { data } = await $host.get("api/type");
+        return data;
+    }
 
-export const createBrand = async (brand) => {
-    const { data } = await $authHost.post("api/brand", brand);
-    return data;
-};
+    // BRAND //
 
-export const updateBrand = async (id, brand) => {
-    const { data } = await $authHost.patch("api/brand/" + id, brand);
-    return data;
-};
+    static async createBrand(brand) {
+        const { data } = await $authHost.post("api/brand", brand);
+        return data;
+    }
 
-export const deleteBrand = async (id) => {
-    const { data } = await $authHost.delete("api/brand/" + id);
-    return data;
-};
+    static async updateBrand(id, brand) {
+        const { data } = await $authHost.patch("api/brand/" + id, brand);
+        return data;
+    }
 
-export const fetchBrands = async () => {
-    const { data } = await $host.get("api/brand");
-    return data;
-};
+    static async deleteBrand(id) {
+        const { data } = await $authHost.delete("api/brand/" + id);
+        return data;
+    }
 
-// PRODUCT //
+    static async fetchBrands() {
+        const { data } = await $host.get("api/brand");
+        return data;
+    }
 
-export const createProduct = async (product) => {
-    const { data } = await $authHost.post("api/product", product);
-    return data;
-};
+    // PRODUCT //
 
-export const updateProduct = async (id, product) => {
-    const { data } = await $authHost.patch("api/product/" + id, product);
-    return data;
-};
+    static async createProduct(product) {
+        const { data } = await $authHost.post("api/product", product);
+        return data;
+    }
 
-export const deleteProduct = async (id) => {
-    const { data } = await $authHost.delete("api/product/" + id);
-    return data;
-};
+    static async updateProduct(id, product) {
+        const { data } = await $authHost.patch("api/product/" + id, product);
+        return data;
+    }
 
-export const fetchProducts = async (typeId, brandId) => {
-    const { data } = await $host.get("api/product", {
-        params: {
-            typeId,
-            brandId,
-        },
-    });
-    return data;
-};
+    static async deleteProduct(id) {
+        const { data } = await $authHost.delete("api/product/" + id);
+        return data;
+    }
 
-export const fetchOneProduct = async (id) => {
-    const { data } = await $host.get("api/product/" + id);
-    return data;
-};
+    static async fetchProducts(typeId, brandId) {
+        const { data } = await $host.get("api/product", {
+            params: {
+                typeId,
+                brandId,
+            },
+        });
+        return data;
+    }
+
+    static async fetchOneProduct(id) {
+        const { data } = await $host.get("api/product/" + id);
+        return data;
+    }
+}

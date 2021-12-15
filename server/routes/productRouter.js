@@ -13,7 +13,7 @@ router.patch("/:id", checkRole("ADMIN"), productController.updateOne);
 
 router.delete("/:id", checkRole("ADMIN"), productController.deleteOne);
 
-router.get("/comments", productController.getComments);
+router.get("/comments/:productId", productController.getComments);
 router.post("/comments", productController.addComment);
 
 module.exports = router;

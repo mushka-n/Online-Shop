@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE, SHOP_ROUTE } from "../utils/consts";
-import { login, registration } from "../API/userAPI";
+import UserAPI from "../API/userAPI";
 import { observer } from "mobx-react-lite";
 import { Context } from "../index";
 import BasketAPI from "../API/basketAPI";
@@ -22,9 +22,9 @@ const Auth = observer(() => {
         try {
             let userData = {};
             if (isLogin) {
-                userData = await login(email, password);
+                userData = await UserAPI.login(email, password);
             } else {
-                userData = await registration(email, password);
+                userData = await UserAPI.registration(email, password);
                 await BasketAPI.createBasket(userData.id);
             }
             localStorage.setItem("token", userData.accessToken);

@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
 import { Dropdown, Form, Modal, Row, Button } from "react-bootstrap";
 import { Context } from "../../..";
-import { deleteProduct, fetchProducts } from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for deleting a Product model
 const DeleteBrand = observer(({ show, onHide }) => {
@@ -11,13 +11,13 @@ const DeleteBrand = observer(({ show, onHide }) => {
     const [currentProduct, setCurrentProduct] = useState({});
 
     useEffect(() => {
-        fetchProducts(null, null).then((data) =>
+        ProductAPI.fetchProducts(null, null).then((data) =>
             product.setProducts(data.rows)
         );
     }, [product]);
 
     const click = () => {
-        deleteProduct(currentProduct.id).then(() => {
+        ProductAPI.deleteProduct(currentProduct.id).then(() => {
             onHide();
         });
     };

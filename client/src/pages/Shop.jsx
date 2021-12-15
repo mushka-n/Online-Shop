@@ -5,23 +5,24 @@ import { Context } from "..";
 import BrandBar from "../components/BrandBar";
 import ProductList from "../components/ProductList";
 import TypeBar from "../components/TypeBar";
-import { fetchBrands, fetchProducts, fetchTypes } from "../API/productAPI";
+import ProductAPI from "../API/productAPI";
 
 const Shop = observer(() => {
     const { product } = useContext(Context);
 
     useEffect(() => {
-        fetchTypes().then((data) => product.setTypes(data));
-        fetchBrands().then((data) => product.setBrands(data));
-        fetchProducts(null, null).then((data) =>
+        ProductAPI.fetchTypes().then((data) => product.setTypes(data));
+        ProductAPI.fetchBrands().then((data) => product.setBrands(data));
+        ProductAPI.fetchProducts(null, null).then((data) =>
             product.setProducts(data.rows)
         );
     }, [product]);
 
     useEffect(() => {
-        fetchProducts(product.selectedType.id, product.selectedBrand.id).then(
-            (data) => product.setProducts(data.rows)
-        );
+        ProductAPI.fetchProducts(
+            product.selectedType.id,
+            product.selectedBrand.id
+        ).then((data) => product.setProducts(data.rows));
     }, [product.selectedType, product.selectedBrand, product]);
 
     return (

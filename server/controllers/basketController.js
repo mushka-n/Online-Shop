@@ -18,7 +18,7 @@ class BasketController {
         }
     }
 
-    // returns list of products added to the basket with extra data
+    // returns list of products from user's the basket with extra data
     async getBasketProducts(req, res, next) {
         try {
             const { userId } = req.query;

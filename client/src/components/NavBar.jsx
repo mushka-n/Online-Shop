@@ -10,7 +10,7 @@ import {
     SHOP_ROUTE,
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
-import { logout } from "../API/userAPI";
+import UserAPI from "../API/userAPI";
 
 const NavBar = observer(() => {
     const { user } = useContext(Context);
@@ -20,7 +20,7 @@ const NavBar = observer(() => {
         user.setUser({});
         user.setIsAuth(false);
         localStorage.removeItem("token");
-        await logout();
+        await UserAPI.logout();
     };
 
     return (

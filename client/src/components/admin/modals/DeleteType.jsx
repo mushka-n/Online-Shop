@@ -2,18 +2,18 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect } from "react";
 import { Dropdown, Form, Modal, Row, Button } from "react-bootstrap";
 import { Context } from "../../..";
-import { deleteType, fetchTypes } from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for deleting a Type model
 const DeleteType = observer(({ show, onHide }) => {
     const { product } = useContext(Context);
 
     useEffect(() => {
-        fetchTypes().then((data) => product.setTypes(data));
+        ProductAPI.fetchTypes().then((data) => product.setTypes(data));
     }, [product]);
 
     const click = () => {
-        deleteType(product.selectedType.id).then(() => {
+        ProductAPI.deleteType(product.selectedType.id).then(() => {
             onHide();
         });
     };

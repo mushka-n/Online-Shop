@@ -10,13 +10,7 @@ import {
     Image,
 } from "react-bootstrap";
 import { Context } from "../../..";
-import {
-    updateProduct,
-    fetchProducts,
-    fetchTypes,
-    fetchBrands,
-    fetchOneProduct,
-} from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for updating a Product model
 const DeleteBrand = observer(({ show, onHide }) => {
@@ -35,15 +29,15 @@ const DeleteBrand = observer(({ show, onHide }) => {
     const [versions, setVersions] = useState([]);
 
     useEffect(() => {
-        fetchTypes().then((data) => product.setTypes(data));
-        fetchBrands().then((data) => product.setBrands(data));
-        fetchProducts(null, null).then((data) =>
+        ProductAPI.fetchTypes().then((data) => product.setTypes(data));
+        ProductAPI.fetchBrands().then((data) => product.setBrands(data));
+        ProductAPI.fetchProducts(null, null).then((data) =>
             product.setProducts(data.rows)
         );
     }, [product]);
 
     const chooseProduct = (id) => {
-        fetchOneProduct(id).then((data) => {
+        ProductAPI.fetchOneProduct(id).then((data) => {
             setCurrentProduct(data);
 
             setName(data.name);
@@ -112,9 +106,11 @@ const DeleteBrand = observer(({ show, onHide }) => {
         formData.append("info", JSON.stringify(info));
         formData.append("versions", JSON.stringify(versions));
 
-        updateProduct(Number(currentProduct.id), formData).then(() => {
-            onHide();
-        });
+        ProductAPI.updateProduct(Number(currentProduct.id), formData).then(
+            () => {
+                onHide();
+            }
+        );
     };
 
     return (

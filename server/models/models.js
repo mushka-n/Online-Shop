@@ -56,6 +56,7 @@ const Comment = sequelize.define("comment", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     userId: { type: DataTypes.INTEGER, allowNull: false },
     productId: { type: DataTypes.INTEGER, allowNull: false },
+    ratingId: { type: DataTypes.INTEGER },
     message: { type: DataTypes.STRING },
 });
 
@@ -87,11 +88,11 @@ Basket.belongsTo(User);
 User.hasOne(Token);
 Token.belongsTo(User);
 
-User.hasMany(Rating);
-Rating.belongsTo(User);
-
 User.hasMany(Comment);
 Comment.belongsTo(User);
+
+Comment.hasOne(Rating);
+Rating.belongsTo(Comment);
 
 // Type, Brand
 

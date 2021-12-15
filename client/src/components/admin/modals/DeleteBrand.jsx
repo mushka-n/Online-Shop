@@ -2,18 +2,18 @@ import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect } from "react";
 import { Dropdown, Form, Modal, Row, Button } from "react-bootstrap";
 import { Context } from "../../..";
-import { deleteBrand, fetchBrands } from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for deleting a Brand model
 const DeleteBrand = observer(({ show, onHide }) => {
     const { product } = useContext(Context);
 
     useEffect(() => {
-        fetchBrands().then((data) => product.setBrands(data));
+        ProductAPI.fetchBrands().then((data) => product.setBrands(data));
     }, [product]);
 
     const click = () => {
-        deleteBrand(product.selectedBrand.id).then(() => {
+        ProductAPI.deleteBrand(product.selectedBrand.id).then(() => {
             onHide();
         });
     };

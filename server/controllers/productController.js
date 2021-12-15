@@ -6,6 +6,7 @@ const {
     ProductInfo,
     ProductVersion,
     Rating,
+    Comment,
 } = require("../models/models");
 const ApiError = require("../error/ApiError");
 const productService = require("./services/productService");
@@ -162,32 +163,39 @@ class ProductController {
     // Comments
 
     async addComment(req, res) {
-        const { userId, productId, rate, message } = req.body;
-        const product = await Product.findOne({ where: { id: productId } });
+        try {
+            const { userId, productId, rate, message } = req.body;
 
-        const oldOverallRating = product.rating;
-        let newOverallRating;
-        if (oldOverallRating === null || oldOverallRating === 0) {
-            newOverallRating = rate;
-        } else {
+            const product = await Product.findOne({ where: { id: productId } });
+
+            const oldOverallRating = product.rating;
             const oldRatings = await Rating.findAndCountAll({
                 where: { productId },
             });
-
             let newOverallRating =
                 (oldOverallRating * oldRatings.count + rate) /
                 (oldRatings.count + 1);
             newOverallRating = Math.floor(newOverallRating * 100) / 100;
+
+            const rating = await Rating.create({ productId, userId, rate });
+            await Comment.create({
+                userId,
+                productId,
+                message,
+                ratingId: rating.id,
+            });
+
+            product.rating = newOverallRating;
+            await product.save();
+            return res.json(product);
+        } catch (e) {
+            next(e);
         }
-        await Rating.create({ productId, userId, rate });
-        product.rating = newOverallRating;
-        await product.save();
-        return res.json(product);
     }
 
     async getComments(req, res) {
-        const { productId } = req.params;
-        const comments = await Product.findAndCountAll({
+        const productId = +req.params.productId;
+        const comments = await Comment.findAndCountAll({
             where: { productId },
         });
         return res.json(comments);

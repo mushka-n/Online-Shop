@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import { Button, Form } from "react-bootstrap";
-import { createBrand } from "../../../API/productAPI";
+import ProductAPI from "../../../API/productAPI";
 
 // Modal window for creating a new Brand model
 const CreateBrand = ({ show, onHide }) => {
     const [value, setValue] = useState("");
 
     const addBrand = () => {
-        createBrand({ name: value }).then(() => {
+        ProductAPI.createBrand({ name: value }).then(() => {
             setValue("");
             onHide();
         });
