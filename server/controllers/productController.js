@@ -1,7 +1,12 @@
 const uuid = require("uuid");
 const path = require("path");
 const fs = require("fs");
-const { Product, ProductInfo, ProductVersion } = require("../models/models");
+const {
+    Product,
+    ProductInfo,
+    ProductVersion,
+    Rating,
+} = require("../models/models");
 const ApiError = require("../error/ApiError");
 const productService = require("./services/productService");
 
@@ -61,34 +66,34 @@ class ProductController {
 
     async getAll(req, res) {
         let { brandId, typeId, limit, page } = req.query;
-
         page = page || 1;
         limit = limit || 9;
         let offset = page * limit - limit;
-
         let products;
         if (!brandId && !typeId) {
             products = await Product.findAndCountAll({ limit, offset });
-        } else if (brandId && !typeId) {
+        }
+        if (brandId && !typeId) {
             products = await Product.findAndCountAll({
                 where: { brandId },
                 limit,
                 offset,
             });
-        } else if (!brandId && typeId) {
+        }
+        if (!brandId && typeId) {
             products = await Product.findAndCountAll({
                 where: { typeId },
                 limit,
                 offset,
             });
-        } else if (brandId && typeId) {
+        }
+        if (brandId && typeId) {
             products = await Product.findAndCountAll({
-                where: { brandId, typeId },
+                where: { typeId, brandId },
                 limit,
                 offset,
             });
         }
-
         return res.json(products);
     }
 
@@ -104,7 +109,6 @@ class ProductController {
         return res.json(product);
     }
 
-    // Update Single Product
     async updateOne(req, res) {
         try {
             const id = req.params.id;
@@ -153,6 +157,40 @@ class ProductController {
         } catch (e) {
             res.send(e.message);
         }
+    }
+
+    // Comments
+
+    async addComment(req, res) {
+        const { userId, productId, rate, message } = req.body;
+        const product = await Product.findOne({ where: { id: productId } });
+
+        const oldOverallRating = product.rating;
+        let newOverallRating;
+        if (oldOverallRating === null || oldOverallRating === 0) {
+            newOverallRating = rate;
+        } else {
+            const oldRatings = await Rating.findAndCountAll({
+                where: { productId },
+            });
+
+            let newOverallRating =
+                (oldOverallRating * oldRatings.count + rate) /
+                (oldRatings.count + 1);
+            newOverallRating = Math.floor(newOverallRating * 100) / 100;
+        }
+        await Rating.create({ productId, userId, rate });
+        product.rating = newOverallRating;
+        await product.save();
+        return res.json(product);
+    }
+
+    async getComments(req, res) {
+        const { productId } = req.params;
+        const comments = await Product.findAndCountAll({
+            where: { productId },
+        });
+        return res.json(comments);
     }
 }
 
