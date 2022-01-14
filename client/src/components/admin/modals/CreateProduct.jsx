@@ -1,13 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
-import Modal from "react-bootstrap/Modal";
-import { Button, Dropdown, Form, Row, Col, Image } from "react-bootstrap";
 import { Context } from "../../../index";
 import ProductAPI from "../../../API/productAPI";
 import { observer } from "mobx-react-lite";
+import {
+    Footer,
+    Header,
+    Input,
+    InputFile,
+    Modal,
+    Dropdown,
+    Array,
+} from "./modalComponents";
 
 // Modal window for creating a new Product model
 const CreateProduct = observer(({ show, onHide }) => {
     const { product } = useContext(Context);
+
+    const [type, setType] = useState({});
+    const [brand, setBrand] = useState({});
     const [name, setName] = useState("");
     const [price, setPrice] = useState(null);
     const [file, setFile] = useState(null);
@@ -20,242 +30,91 @@ const CreateProduct = observer(({ show, onHide }) => {
         ProductAPI.fetchBrands().then((data) => product.setBrands(data));
     }, [product]);
 
-    const add = (arr, setArr, params) => {
-        params.number = Date.now();
-        setArr([...arr, params]);
-    };
-    const remove = (arr, setArr, number) => {
-        setArr(arr.filter((i) => i.number !== number));
-    };
-
-    const change = (arr, setArr, key, value, number) => {
-        setArr(
-            arr.map((i) => (i.number === number ? { ...i, [key]: value } : i))
-        );
-    };
-
-    const selectFile = (e) => {
-        let newFile = e.target.files[0];
-        setFile(newFile);
-
-        var reader = new FileReader();
-        reader.readAsDataURL(newFile);
-        reader.onloadend = () => {
-            setFileImg(reader.result);
-        };
-    };
-
-    const addProduct = () => {
+    const submit = () => {
         const formData = new FormData();
         formData.append("name", name);
         formData.append("price", `${price}`);
         formData.append("img", file);
-        formData.append("brandId", product.selectedBrand.id);
-        formData.append("typeId", product.selectedType.id);
+        formData.append("brandId", brand.id);
+        formData.append("typeId", type.id);
         formData.append("info", JSON.stringify(info));
         formData.append("versions", JSON.stringify(versions));
 
-        ProductAPI.createProduct(formData).then(() => onHide());
+        ProductAPI.createProduct(formData).then(() => {
+            onHide();
+            document.location.reload();
+        });
     };
 
     return (
-        <Modal show={show} onHide={onHide} centered>
-            <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    Добавить устройство
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Row className="mt-2 mb-2">
-                        <Dropdown style={{ width: "50%" }}>
-                            <Dropdown.Toggle>
-                                {product.selectedType.name || "Выберите тип"}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {product.types.map((type) => (
-                                    <Dropdown.Item
-                                        onClick={() =>
-                                            product.setSelectedType(type)
-                                        }
-                                        key={type.id}
-                                    >
-                                        {type.name}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Dropdown style={{ width: "40%" }}>
-                            <Dropdown.Toggle>
-                                {product.selectedBrand.name || "Выберите бренд"}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {product.brands.map((brand) => (
-                                    <Dropdown.Item
-                                        onClick={() =>
-                                            product.setSelectedBrand(brand)
-                                        }
-                                        key={brand.id}
-                                    >
-                                        {brand.name}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Row>
-                    <Form.Control
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="mt-3"
-                        placeholder="Введите название устройства"
-                    />
-                    <Form.Control
-                        value={price}
-                        onChange={(e) => setPrice(Number(e.target.value))}
-                        className="mt-3"
-                        placeholder="Введите стоимость устройства"
-                        type="number"
-                    />
-                    <Form.Group
-                        style={{
-                            height: "auto",
-                            marginTop: "14px",
-                            padding: "14px 0",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Form.Control
-                            style={{ height: "33px" }}
-                            type="file"
-                            onChange={selectFile}
-                        />
-                        <Form.Label>
-                            <Image
-                                style={{
-                                    marginTop: "14px",
-                                    maxHeight: "232px",
-                                }}
-                                src={fileImg}
-                                height={"auto"}
-                            />
-                        </Form.Label>
-                    </Form.Group>
-                    <hr />
-                    <Button
-                        variant={"outline-dark"}
-                        onClick={() =>
-                            add(info, setInfo, { title: "", description: "" })
-                        }
-                    >
-                        Добавить новое свойство
-                    </Button>
-                    {info.map((i) => (
-                        <Row className="mt-2" key={i.number}>
-                            <Col>
-                                <Form.Control
-                                    value={i.title}
-                                    onChange={(e) =>
-                                        change(
-                                            info,
-                                            setInfo,
-                                            "title",
-                                            e.target.value,
-                                            i.number
-                                        )
-                                    }
-                                    placeholder="Введите название свойства"
-                                />
-                            </Col>
-                            <Col>
-                                <Form.Control
-                                    value={i.description}
-                                    onChange={(e) =>
-                                        change(
-                                            info,
-                                            setInfo,
-                                            "description",
-                                            e.target.value,
-                                            i.number
-                                        )
-                                    }
-                                    placeholder="Введите описание свойства"
-                                />
-                            </Col>
-                            <Col>
-                                <Button
-                                    onClick={() =>
-                                        remove(info, setInfo, i.number)
-                                    }
-                                    variant={"outline-danger"}
-                                >
-                                    Удалить
-                                </Button>
-                            </Col>
-                        </Row>
-                    ))}
-                    <hr />
-                    <Button
-                        variant={"outline-dark"}
-                        onClick={() =>
-                            add(versions, setVersions, { title: "", stock: "" })
-                        }
-                    >
-                        Добавить вкус
-                    </Button>
-                    {versions.map((i) => (
-                        <Row className="mt-2" key={i.number}>
-                            <Col>
-                                <Form.Control
-                                    value={i.title}
-                                    onChange={(e) =>
-                                        change(
-                                            versions,
-                                            setVersions,
-                                            "title",
-                                            e.target.value,
-                                            i.number
-                                        )
-                                    }
-                                    placeholder="Введите название вкуса"
-                                />
-                            </Col>
-                            <Col>
-                                <Form.Control
-                                    value={i.stock}
-                                    type="number"
-                                    onChange={(e) =>
-                                        change(
-                                            versions,
-                                            setVersions,
-                                            "stock",
-                                            e.target.value,
-                                            i.number
-                                        )
-                                    }
-                                    placeholder="Введите кол-во"
-                                />
-                            </Col>
-                            <Col>
-                                <Button
-                                    onClick={() =>
-                                        remove(versions, setVersions, i.number)
-                                    }
-                                    variant={"outline-danger"}
-                                >
-                                    Удалить
-                                </Button>
-                            </Col>
-                        </Row>
-                    ))}
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="outline-success" onClick={addProduct}>
-                    Добавить продукт
-                </Button>
-            </Modal.Footer>
+        <Modal show={show} onHide={onHide}>
+            <Header>Добавить продукт</Header>
+
+            <div className="flex justify-between my-3">
+                <Dropdown
+                    id="type"
+                    options={product.types}
+                    selectedOption={type}
+                    setSelectedOption={setType}
+                    label="Тип"
+                    placeholder="Выберите тип"
+                />
+                <Dropdown
+                    id="brand"
+                    options={product.brands}
+                    selectedOption={brand}
+                    setSelectedOption={setBrand}
+                    label="Бренд"
+                    placeholder="Выберите бренд"
+                />
+            </div>
+
+            <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                label="Название"
+                placeholder="Введите название устройста"
+            />
+
+            <Input
+                id="price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                label="Цена"
+                placeholder="Введите цену устройста"
+            />
+
+            <InputFile
+                setFile={setFile}
+                fileImg={fileImg}
+                setFileImg={setFileImg}
+                label="Изображение"
+                placeholder="Выберите изображение продукта"
+            />
+
+            <Array
+                arr={info}
+                setArr={setInfo}
+                buttonText="Добавить свойтсво"
+                template={{
+                    title: { placeholder: "Введите название" },
+                    description: { placeholder: "Введите значение" },
+                }}
+            />
+
+            <Array
+                arr={versions}
+                setArr={setVersions}
+                buttonText="Добавить версию продукта"
+                template={{
+                    title: { placeholder: "Введите название" },
+                    stock: { type: "number", placeholder: "Введите значение" },
+                }}
+            />
+
+            <Footer submit={submit}>Добавить продукт</Footer>
         </Modal>
     );
 });

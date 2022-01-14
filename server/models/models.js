@@ -18,6 +18,7 @@ const Token = sequelize.define("token", {
 const Type = sequelize.define("type", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, unique: true, allowNull: false },
+    icon: { type: DataTypes.STRING, allowNull: false },
 });
 
 const Brand = sequelize.define("brand", {
@@ -34,7 +35,7 @@ const Product = sequelize.define("product", {
     name: { type: DataTypes.STRING, unique: true, allowNull: false },
     price: { type: DataTypes.INTEGER, allowNull: false },
     stock: { type: DataTypes.INTEGER },
-    rating: { type: DataTypes.INTEGER, defaultValue: 0 },
+    rating: { type: DataTypes.FLOAT, defaultValue: 0 },
     img: { type: DataTypes.STRING, allowNull: false },
 });
 
@@ -56,13 +57,8 @@ const Comment = sequelize.define("comment", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     userId: { type: DataTypes.INTEGER, allowNull: false },
     productId: { type: DataTypes.INTEGER, allowNull: false },
-    ratingId: { type: DataTypes.INTEGER },
+    rate: { type: DataTypes.INTEGER },
     message: { type: DataTypes.STRING },
-});
-
-const Rating = sequelize.define("rating", {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    rate: { type: DataTypes.INTEGER, allowNull: true, defaultValue: null },
 });
 
 const Basket = sequelize.define("basket", {
@@ -91,9 +87,6 @@ Token.belongsTo(User);
 User.hasMany(Comment);
 Comment.belongsTo(User);
 
-Comment.hasOne(Rating);
-Rating.belongsTo(Comment);
-
 // Type, Brand
 
 Type.hasMany(Product);
@@ -107,10 +100,7 @@ Brand.belongsToMany(Type, { through: TypeBrand });
 
 // Product
 
-Product.hasMany(Rating);
-Rating.belongsTo(Product);
-
-Product.hasMany(Rating);
+Product.hasMany(Comment);
 Comment.belongsTo(Product);
 
 Product.hasMany(ProductInfo, { as: "info" });
@@ -134,7 +124,6 @@ module.exports = {
     ProductInfo,
     ProductVersion,
     Comment,
-    Rating,
     Basket,
     BasketProduct,
 };

@@ -7,7 +7,7 @@ const AppRouter = () => {
         <Routes>
             {authRoutes.map(({ path, Component }) => (
                 <Route key={path} path={path} element={<PrivateRoute />}>
-                    <Route path={path} element={<Component />} />
+                    <Route key={path} path={path} element={<Component />} />
                 </Route>
             ))}
 

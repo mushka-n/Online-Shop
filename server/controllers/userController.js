@@ -27,7 +27,6 @@ class UserController {
             if (candidate) {
                 throw ApiError.BadRequest("Email уже зарегестрирован");
             }
-
             const hashPassword = await bcrypt.hash(password, 5);
             const activationLink = uuid.v4();
             const user = await User.create({
@@ -37,10 +36,10 @@ class UserController {
                 activationLink,
             });
 
-            await mailService.sendActivationLink(
-                email,
-                `${process.env.API_URL}/api/user/activate/${activationLink}`
-            );
+            // await mailService.sendActivationLink(
+            //     email,
+            //     `${process.env.API_URL}/api/user/activate/${activationLink}`
+            // );
 
             const data = tokenService.saveResults(res, user);
             return res.send(data);

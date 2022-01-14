@@ -1,11 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
 import { BrowserRouter } from "react-router-dom";
 import { Context } from ".";
 import AppRouter from "./components/AppRouter/AppRouter";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/NavBar/NavBar";
 import UserAPI from "./API/userAPI";
-import { observer } from "mobx-react-lite";
 
 const App = () => {
     const { user } = useContext(Context);
@@ -27,21 +25,19 @@ const App = () => {
     }, [user]);
 
     if (isLoading) {
-        return <Spinner animation={"grow"} />;
+        return <div></div>;
     }
 
     return (
         <BrowserRouter>
-            <NavBar />
-            <h1>
-                <strong>isAuth</strong>: {user.isAuth.toString()}
-            </h1>
-            <h1>
-                <strong>User Email</strong>: {user.user.email || "NO EMAIL"}
-            </h1>
-            <AppRouter />
+            <div className="global-bg">
+                <NavBar />
+                <div className="container">
+                    <AppRouter />
+                </div>
+            </div>
         </BrowserRouter>
     );
 };
 
-export default observer(App);
+export default App;

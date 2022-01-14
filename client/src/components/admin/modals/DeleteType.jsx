@@ -1,58 +1,37 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect } from "react";
-import { Dropdown, Form, Modal, Row, Button } from "react-bootstrap";
+import { useState } from "react";
 import { Context } from "../../..";
 import ProductAPI from "../../../API/productAPI";
+import { Dropdown, Footer, Header, Modal } from "./modalComponents";
 
 // Modal window for deleting a Type model
 const DeleteType = observer(({ show, onHide }) => {
     const { product } = useContext(Context);
+    const [type, setType] = useState({});
 
     useEffect(() => {
         ProductAPI.fetchTypes().then((data) => product.setTypes(data));
     }, [product]);
 
-    const click = () => {
-        ProductAPI.deleteType(product.selectedType.id).then(() => {
+    const submit = () => {
+        ProductAPI.deleteType(type.id).then(() => {
             onHide();
+            document.location.reload();
         });
     };
 
     return (
         <Modal show={show} onHide={onHide} centered>
-            <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    Удалить тип
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Row className="mt-2 mb-2">
-                        <Dropdown style={{ width: "50%" }}>
-                            <Dropdown.Toggle>
-                                {product.selectedType.name || "Выберите тип"}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {product.types.map((type) => (
-                                    <Dropdown.Item
-                                        onClick={() =>
-                                            product.setSelectedType(type)
-                                        }
-                                        key={type.id}
-                                    >
-                                        {type.name}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Row>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="outline-danger" onClick={click}>
-                    Удалить
-                </Button>
-            </Modal.Footer>
+            <Header>Удалить тип</Header>
+            <Dropdown
+                options={product.types}
+                selectedOption={type}
+                setSelectedOption={setType}
+                label="Тип"
+                placeholder="Выберите тип"
+            />
+            <Footer submit={submit}>Удалить тип</Footer>
         </Modal>
     );
 });

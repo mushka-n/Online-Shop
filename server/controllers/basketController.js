@@ -49,6 +49,7 @@ class BasketController {
                     id: bp.productId,
                     img: product.img,
                     name: product.name,
+                    price: product.price,
                     rating: product.rating,
                     versionId: version.id,
                     versionTitle: version.title,

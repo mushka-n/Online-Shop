@@ -14,6 +14,17 @@ router.patch("/:id", checkRole("ADMIN"), productController.updateOne);
 router.delete("/:id", checkRole("ADMIN"), productController.deleteOne);
 
 router.get("/comments/:productId", productController.getComments);
-router.post("/comments", productController.addComment);
+router.post("/comments", authMiddleware, productController.addComment);
+
+router.delete(
+    "/comments/deleteByUser",
+    authMiddleware,
+    productController.addComment
+);
+router.delete(
+    "/comments/deleteByAdmin",
+    checkRole("ADMIN"),
+    productController.addComment
+);
 
 module.exports = router;

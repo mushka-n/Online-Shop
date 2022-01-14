@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Row, Button } from "react-bootstrap";
 import CreateProduct from "./modals/CreateProduct";
 import DeleteProduct from "./modals/DeleteProduct";
+import { Button } from "./modals/modalComponents";
 import UpdateProduct from "./modals/UpdateProduct";
 
 const TypePanel = () => {
@@ -10,59 +10,38 @@ const TypePanel = () => {
     const [deleteProductVisible, setDeleteProductVisible] = useState(false);
 
     return (
-        <Row
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "50px",
-            }}
-        >
-            <h3 style={{ display: "block", textAlign: "center" }}>
-                Действия с продуктами
-            </h3>
+        <div className="w-full h-1/3">
+            <h3 className="w-full text-center my-8">Действия с продуктами</h3>
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-dark"}
-                className="m-4 p-2"
-                onClick={() => setCreateProductVisible(true)}
-            >
-                Добавить продукт
-            </Button>
+            <div className="flex items-center justify-around">
+                <Button onClick={() => setCreateProductVisible(true)}>
+                    Добавить продукт
+                </Button>
 
-            <CreateProduct
-                show={createProductVisible}
-                onHide={() => setCreateProductVisible(false)}
-            />
+                <CreateProduct
+                    show={createProductVisible}
+                    onHide={() => setCreateProductVisible(false)}
+                />
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-dark"}
-                className="m-4 p-2"
-                onClick={() => setUpdateProductVisible(true)}
-            >
-                Изменить продукт
-            </Button>
+                <Button onClick={() => setUpdateProductVisible(true)}>
+                    Изменить продукт
+                </Button>
 
-            <UpdateProduct
-                show={updateProductVisible}
-                onHide={() => setUpdateProductVisible(false)}
-            />
+                <UpdateProduct
+                    show={updateProductVisible}
+                    onHide={() => setUpdateProductVisible(false)}
+                />
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-danger"}
-                className="m-4 p-2"
-                onClick={() => setDeleteProductVisible(true)}
-            >
-                Удалить продукт
-            </Button>
+                <Button onClick={() => setDeleteProductVisible(true)}>
+                    Удалить продукт
+                </Button>
 
-            <DeleteProduct
-                show={deleteProductVisible}
-                onHide={() => setDeleteProductVisible(false)}
-            />
-        </Row>
+                <DeleteProduct
+                    show={deleteProductVisible}
+                    onHide={() => setDeleteProductVisible(false)}
+                />
+            </div>
+        </div>
     );
 };
 

@@ -1,14 +1,19 @@
 import { observer } from "mobx-react-lite";
-import React, { useContext, useEffect } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "..";
-import BrandBar from "../components/BrandBar";
-import ProductList from "../components/ProductList";
-import TypeBar from "../components/TypeBar";
+import ProductList from "../components/Shop/ProductList";
+import TypeBar from "../components/TypeBar/TypeBar";
 import ProductAPI from "../API/productAPI";
+import BrandBar from "../components/BrandBar/BrandBar";
+import Filters from "../images/svgs/filters.svg";
 
 const Shop = observer(() => {
     const { product } = useContext(Context);
+    const [filtersToggle, setFiltersToggle] = useState("hidden");
+    const toggleFilters = () => {
+        if (filtersToggle === "hidden") setFiltersToggle("block");
+        else setFiltersToggle("hidden");
+    };
 
     useEffect(() => {
         ProductAPI.fetchTypes().then((data) => product.setTypes(data));
@@ -26,17 +31,23 @@ const Shop = observer(() => {
     }, [product.selectedType, product.selectedBrand, product]);
 
     return (
-        <Container>
-            <Row className="mt-2">
-                <Col md={3}>
-                    <TypeBar />
-                </Col>
-                <Col md={9}>
+        <div className="flex flex-col md:flex-row w-full">
+            <div className="block md:hidden my-3">
+                <button className="font-bold" onClick={toggleFilters}>
+                    <img className="inline-block mr-3" src={Filters} alt="" />
+                    Фильтры
+                </button>
+            </div>
+            <div className={`${filtersToggle} md:block logo-and-typebar`}>
+                <TypeBar />
+            </div>
+            <div className="ml-0 md:ml-12 w-full">
+                <div className={`${filtersToggle} md:block`}>
                     <BrandBar />
-                    <ProductList />
-                </Col>
-            </Row>
-        </Container>
+                </div>
+                <ProductList />
+            </div>
+        </div>
     );
 });
 

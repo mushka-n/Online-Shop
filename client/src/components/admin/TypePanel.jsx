@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Row, Button } from "react-bootstrap";
 import CreateType from "./modals/CreateType";
 import DeleteType from "./modals/DeleteType";
+import { Button } from "./modals/modalComponents";
 import UpdateType from "./modals/UpdateType";
 
 const TypePanel = () => {
@@ -10,59 +10,40 @@ const TypePanel = () => {
     const [deleteTypeVisible, setDeleteTypeVisible] = useState(false);
 
     return (
-        <Row
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "50px",
-            }}
-        >
-            <h3 style={{ display: "block", textAlign: "center" }}>
+        <div className="w-full h-1/3">
+            <h3 className="w-full text-center my-8">
                 Действия с типами продуктов
             </h3>
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-dark"}
-                className="p-2 m-4"
-                onClick={() => setCreateTypeVisible(true)}
-            >
-                Добавить тип
-            </Button>
+            <div className="flex items-center justify-around">
+                <Button onClick={() => setCreateTypeVisible(true)}>
+                    Добавить тип
+                </Button>
 
-            <CreateType
-                show={createTypeVisible}
-                onHide={() => setCreateTypeVisible(false)}
-            />
+                <CreateType
+                    show={createTypeVisible}
+                    onHide={() => setCreateTypeVisible(false)}
+                />
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-dark"}
-                className="p-2 m-4"
-                onClick={() => setUpdateTypeVisible(true)}
-            >
-                Изменить тип
-            </Button>
+                <Button onClick={() => setUpdateTypeVisible(true)}>
+                    Изменить тип
+                </Button>
 
-            <UpdateType
-                show={updateTypeVisible}
-                onHide={() => setUpdateTypeVisible(false)}
-            />
+                <UpdateType
+                    show={updateTypeVisible}
+                    onHide={() => setUpdateTypeVisible(false)}
+                />
 
-            <Button
-                style={{ width: "25%" }}
-                variant={"outline-danger"}
-                className="p-2 m-4"
-                onClick={() => setDeleteTypeVisible(true)}
-            >
-                Удалить тип
-            </Button>
+                <Button onClick={() => setDeleteTypeVisible(true)}>
+                    Удалить тип
+                </Button>
 
-            <DeleteType
-                show={deleteTypeVisible}
-                onHide={() => setDeleteTypeVisible(false)}
-            />
-        </Row>
+                <DeleteType
+                    show={deleteTypeVisible}
+                    onHide={() => setDeleteTypeVisible(false)}
+                />
+            </div>
+        </div>
     );
 };
 

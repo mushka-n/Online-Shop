@@ -1,67 +1,33 @@
-const uuid = require("uuid");
-const path = require("path");
-const fs = require("fs");
 const {
     Product,
     ProductInfo,
     ProductVersion,
-    Rating,
     Comment,
+    BasketProduct,
 } = require("../models/models");
-const ApiError = require("../error/ApiError");
 const productService = require("./services/productService");
+const Op = require("sequelize").Op;
+const imgService = require("./services/imgService");
 
 class ProductController {
     async create(req, res, next) {
         try {
             let { name, price, brandId, typeId, info, versions } = req.body;
+
+            const productBody = { name, price, brandId, typeId, img: "" };
+            const product = await Product.create(productBody);
+            const id = product.id;
+
             const { img } = req.files;
+            const fileName = imgService.addImg(img);
 
-            let fileName = uuid.v4() + ".jpg";
-            img.mv(path.resolve(__dirname, "..", "static", fileName));
+            await productService.createInfo(id, info);
+            const stock = await productService.createVersions(id, versions);
 
-            let wholeStock = 0;
-            if (versions) {
-                versions = JSON.parse(versions);
-                versions.forEach((v) => {
-                    wholeStock += parseInt(v.stock);
-                });
-            }
-
-            const product = await Product.create({
-                name,
-                price,
-                brandId,
-                typeId,
-                stock: wholeStock,
-                img: fileName,
-            });
-
-            if (info) {
-                info = JSON.parse(info);
-                info.forEach((i) =>
-                    ProductInfo.create({
-                        title: i.title,
-                        description: i.description,
-                        productId: product.id,
-                    })
-                );
-            }
-
-            if (versions) {
-                versions.forEach((v) => {
-                    wholeStock += parseInt(v.stock);
-                    ProductVersion.create({
-                        title: v.title,
-                        stock: v.stock,
-                        productId: product.id,
-                    });
-                });
-            }
-
+            await product.update({ img: fileName, stock });
             return res.json(product);
         } catch (e) {
-            next(ApiError.badRequest(e.message));
+            next(e);
         }
     }
 
@@ -114,28 +80,17 @@ class ProductController {
         try {
             const id = req.params.id;
             let { name, price, brandId, typeId, info, versions } = req.body;
-            const updatedProduct = { name, price, brandId, typeId };
 
-            // If Image Is Provided
+            const product = await Product.findOne({ where: { id } });
             if (req.files) {
-                // Add New Image To Params To Update
                 const { img } = req.files;
-                let fileName = uuid.v4() + ".jpg";
-                img.mv(path.resolve(__dirname, "..", "static", fileName));
-                updatedProduct.img = fileName;
-
-                // Destroy Old Image
-                const oldProduct = await Product.findOne({ where: { id } });
-                const oldImg = oldProduct.img;
-                let filePath = path.resolve(__dirname, "..", "static", oldImg);
-                fs.unlinkSync(filePath);
+                imgService.updateImg(img, product.img);
             }
 
             await productService.updateInfo(id, info);
             const stock = await productService.updateVersions(id, versions);
-            updatedProduct.stock = stock;
-            await Product.update(updatedProduct, { where: { id } });
 
+            await product.update({ name, price, brandId, typeId, stock });
             return res.send(200);
         } catch (e) {
             next(e);
@@ -146,14 +101,15 @@ class ProductController {
         try {
             const { id } = req.params;
 
-            const oldProduct = await Product.findOne({ where: { id } });
-            const oldImg = oldProduct.img;
-            let filePath = path.resolve(__dirname, "..", "static", oldImg);
-            fs.unlinkSync(filePath);
+            await BasketProduct.destroy({ where: { productId: id } });
+            await Comment.destroy({ where: { productId: id } });
+            productService.deleteInfo(id);
+            productService.deleteVersions(id);
 
-            await Product.destroy({ where: { id: id } });
-            await ProductInfo.destroy({ where: { productId: id } });
-            await ProductVersion.destroy({ where: { productId: id } });
+            const product = await Product.findOne({ where: { id } });
+            imgService.deleteImg(product.img);
+            await product.destroy();
+
             res.send(200);
         } catch (e) {
             res.send(e.message);
@@ -164,30 +120,40 @@ class ProductController {
 
     async addComment(req, res) {
         try {
-            const { userId, productId, rate, message } = req.body;
+            const { userId, productId, message, rate } = req.body;
 
             const product = await Product.findOne({ where: { id: productId } });
 
             const oldOverallRating = product.rating;
-            const oldRatings = await Rating.findAndCountAll({
-                where: { productId },
-            });
-            let newOverallRating =
-                (oldOverallRating * oldRatings.count + rate) /
-                (oldRatings.count + 1);
-            newOverallRating = Math.floor(newOverallRating * 100) / 100;
-
-            const rating = await Rating.create({ productId, userId, rate });
-            await Comment.create({
-                userId,
-                productId,
-                message,
-                ratingId: rating.id,
+            const oldRatings = await Comment.findAndCountAll({
+                where: { productId, rate: { [Op.not]: null } },
             });
 
-            product.rating = newOverallRating;
-            await product.save();
-            return res.json(product);
+            const newOverallRating =
+                Math.floor(
+                    ((oldOverallRating * oldRatings.count + rate) /
+                        (oldRatings.count + 1)) *
+                        100
+                ) / 100;
+
+            await Comment.create({ userId, productId, rate, message });
+
+            await Product.update(
+                { rating: newOverallRating },
+                { where: { id: productId } }
+            );
+
+            return res.json(newOverallRating);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteComment(req, res) {
+        try {
+            const { commentId } = req.body;
+            await Comment.destroy({ where: { id: commentId } });
+            return res.send(200);
         } catch (e) {
             next(e);
         }

@@ -1,26 +1,28 @@
 import { observer } from "mobx-react-lite";
 import * as React from "react";
 import { useContext } from "react";
-import { ListGroup } from "react-bootstrap";
-import { Context } from "..";
+import { Context } from "../..";
+import TypeButton from "./TypeButton";
 
 const TypeBar = observer(() => {
     const { product } = useContext(Context);
+
     return (
-        <ListGroup>
+        <div className="">
             {product.types.map((type) => (
-                <ListGroup.Item
+                <TypeButton
+                    className=""
                     active={type.id === product.selectedType.id}
                     onClick={() => {
                         product.setSelectedType(type);
-                        console.log(product.selectedType);
                     }}
+                    img={type.icon}
                     key={type.id}
                 >
                     {type.name}
-                </ListGroup.Item>
+                </TypeButton>
             ))}
-        </ListGroup>
+        </div>
     );
 });
 

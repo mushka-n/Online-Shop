@@ -1,11 +1,6 @@
 import { $authHost, $host } from "./index";
 
 export default class ProductAPI {
-    static async createBasket(userId) {
-        const { data } = await $host.post("api/basket/create", { userId });
-        return data;
-    }
-
     // TYPE //
 
     static async createType(type) {
@@ -79,6 +74,29 @@ export default class ProductAPI {
 
     static async fetchOneProduct(id) {
         const { data } = await $host.get("api/product/" + id);
+        return data;
+    }
+
+    // Comments
+
+    static async addComment(userId, productId, message, rate) {
+        console.log({
+            userId,
+            productId,
+            message,
+            rate,
+        });
+        const { data } = await $host.post("api/product/comments", {
+            userId,
+            productId,
+            message,
+            rate,
+        });
+        return data;
+    }
+
+    static async fetchComments(productId) {
+        const { data } = await $host.get("api/product/comments/" + productId);
         return data;
     }
 }

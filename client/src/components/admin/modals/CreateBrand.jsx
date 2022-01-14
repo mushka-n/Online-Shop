@@ -1,39 +1,29 @@
 import React, { useState } from "react";
-import Modal from "react-bootstrap/Modal";
-import { Button, Form } from "react-bootstrap";
 import ProductAPI from "../../../API/productAPI";
+import { Modal, Header, Input, Footer } from "./modalComponents";
 
 // Modal window for creating a new Brand model
 const CreateBrand = ({ show, onHide }) => {
-    const [value, setValue] = useState("");
+    const [name, setName] = useState("");
 
-    const addBrand = () => {
-        ProductAPI.createBrand({ name: value }).then(() => {
-            setValue("");
+    const submit = () => {
+        ProductAPI.createBrand({ name }).then(() => {
             onHide();
+            document.location.reload();
         });
     };
+
     return (
         <Modal show={show} onHide={onHide} centered>
-            <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    Добавить тип
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Form.Control
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                        placeholder={"Введите название типа"}
-                    />
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="outline-success" onClick={addBrand}>
-                    Добавить
-                </Button>
-            </Modal.Footer>
+            <Header>Добавить бренд</Header>
+            <Input
+                type="text"
+                label="Название"
+                placeholder={"Введите название бренда"}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+            <Footer submit={submit}>Добавить</Footer>
         </Modal>
     );
 };

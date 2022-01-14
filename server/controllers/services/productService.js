@@ -1,25 +1,51 @@
-const ApiError = require("../../error/ApiError");
 const { ProductInfo, ProductVersion } = require("../../models/models");
 
 class ProductService {
-    // Destroys old ProductInfo-s and posts new ones if they are given
+    // Info
+
+    async createInfo(productId, info) {
+        if (info) {
+            info = JSON.parse(info);
+            info.forEach(
+                async (i) =>
+                    await ProductInfo.create({
+                        title: i.title,
+                        description: i.description,
+                        productId,
+                    })
+            );
+        }
+    }
+
     async updateInfo(productId, info) {
         try {
-            await ProductInfo.destroy({ where: { productId } });
-            if (info) {
-                info = JSON.parse(info);
-                info.forEach(
-                    async (i) =>
-                        await ProductInfo.create({
-                            title: i.title,
-                            description: i.description,
-                            productId: id,
-                        })
-                );
-            }
+            await this.deleteInfo(productId);
+            await this.createInfo(productId, info);
         } catch (e) {
             return new Error();
         }
+    }
+
+    async deleteInfo(productId) {
+        await ProductInfo.destroy({ where: { productId } });
+    }
+
+    // Versions
+
+    async createVersions(productId, versions) {
+        let stock = 0;
+        if (versions) {
+            versions = JSON.parse(versions);
+            versions.forEach((v) => {
+                stock += parseInt(v.stock);
+                ProductVersion.create({
+                    title: v.title,
+                    stock: v.stock,
+                    productId,
+                });
+            });
+        }
+        return stock;
     }
 
     async updateVersions(productId, versions) {
@@ -47,13 +73,17 @@ class ProductService {
                 return !versions.find((v) => allV.id === v.id);
             });
 
-            ProductVersion.destroy({
+            await ProductVersion.destroy({
                 where: { id: deletedVersions.map((dv) => dv.id) },
             });
         } catch (e) {
             return new Error();
         }
         return wholeStock;
+    }
+
+    async deleteVersions(productId) {
+        await ProductVersion.destroy({ where: { productId } });
     }
 }
 

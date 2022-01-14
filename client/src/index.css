@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    #root,
+    html {
+        @apply text-base m-0 p-0 box-border not-italic font-bold text-myDark bg-myLight;
+    }
+
+    .auth-btn {
+        @apply p-[15px] bg-myLight text-myDark rounded-[15px] border-4 border-myDark font-bold;
+        @apply hover:bg-myDark hover:text-myLight hover:border-myLight;
+        @apply transition ease-in duration-200;
+    }
+
+    .nav-btn {
+        @apply font-bold px-[30px];
+    }
+
+    .logo-and-typebar {
+        @apply w-full md:w-[22%] md:min-w-[200px];
+    }
+
+    .product-list {
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        column-gap: 20px;
+        row-gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+        grid-template-rows: auto;
+    }
+
+    .product-list-md {
+        grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+    }
+
+    .brand-bar {
+        justify-content: space-between;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, min-content));
+        grid-template-rows: 0fr;
+        grid-auto-columns: 0px;
+    }
+
+    .brand-bar-lg {
+        grid-template-columns: repeat(auto-fit, minmax(14%, min-content));
+    }
+
+    .mobile-menu-btn {
+        @apply m-1 mx-0 rounded-full py-2 my-1;
+        @apply hover:bg-myDark hover:text-myLight;
+        @apply transition ease-in duration-100;
+    }
+
+    .product-card {
+        @apply inline-block w-48;
+    }
+
+    input[type="file"] {
+        @apply w-0 h-0 m-0 p-0;
+    }
+
+    .active {
+        @apply bg-myDark text-myLight;
+    }
+
+    /* ADMIN */
+
+    .modal-dropdown {
+        @apply block w-52 py-2 px-3 border border-myDark bg-myLight rounded-md shadow-sm;
+        @apply focus:outline-none focus:ring-myDark focus:border-myDark;
+    }
+
+    .modal-submit {
+        @apply py-2 px-4 w-auto bg-myDark text-myLight text-center text-base font-semibold rounded-lg;
+        @apply hover:bg-myLight hover:ring-2 hover:ring-myDark hover:text-myDark;
+        @apply focus:ring-myDark focus:ring-offset-myLight focus:outline-none focus:ring-2 focus:ring-offset-2;
+        @apply transition ease-in duration-200;
+    }
+
+    .modal-input {
+        @apply rounded-lg border-transparent flex-1 appearance-none border border-myDark w-full py-2 px-4 bg-myLight text-myDark placeholder-myDark shadow-sm text-base;
+        @apply focus:outline-none focus:ring-2 focus:ring-myDark focus:border-transparent;
+    }
+
+    .modal-input-img {
+        @apply flex items-center justify-center text-center rounded-lg border-transparent flex-1 appearance-none border border-myDark w-full py-2 px-4 bg-myLight text-myDark shadow-sm text-base;
+    }
+}

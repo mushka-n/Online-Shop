@@ -1,19 +1,17 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext } from "react";
-import { Row } from "react-bootstrap";
-import { Context } from "..";
+import { Context } from "../..";
 import ProductItem from "./ProductItem";
 
 const ProductList = observer(() => {
     const { product } = useContext(Context);
-    console.log(product);
 
     return (
-        <Row>
+        <div className="product-list md:product-list-md justify-around md:justify-between">
             {product.products.map((item) => (
                 <ProductItem key={item.id} product={item} />
             ))}
-        </Row>
+        </div>
     );
 });
 

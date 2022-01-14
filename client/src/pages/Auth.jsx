@@ -1,8 +1,4 @@
 import React, { useContext, useState } from "react";
-import { Container, Form } from "react-bootstrap";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE, SHOP_ROUTE } from "../utils/consts";
 import UserAPI from "../API/userAPI";
@@ -25,7 +21,7 @@ const Auth = observer(() => {
                 userData = await UserAPI.login(email, password);
             } else {
                 userData = await UserAPI.registration(email, password);
-                await BasketAPI.createBasket(userData.id);
+                await BasketAPI.createBasket(userData.user.id);
             }
             localStorage.setItem("token", userData.accessToken);
             user.setUser(userData.user);
@@ -37,49 +33,52 @@ const Auth = observer(() => {
     };
 
     return (
-        <Container
-            className="d-flex justify-content-center align-items-center"
-            style={{ height: window.innerHeight - 54 }}
+        <div
+            className="d-flex justify-content-center align-items-center text-myLight font-bold"
+            style={{ height: window.innerHeight - 100 }}
         >
-            <Card style={{ width: 600 }} className="p-5">
+            <div className="p-5 w-[600px] bg-myDark rounded-[30px]">
                 <h2 className="m-auto">
                     {isLogin ? "Авторизация" : "Регистрация"}
                 </h2>
-                <Form className="d-flex flex-column">
-                    <Form.Control
-                        className="mt-3"
+                <div className="d-flex flex-column">
+                    <input
+                        className="mt-3 text-myDark rounded-[15px] py-2 px-4 font-bold"
                         placeholder="Введите ваш email..."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <Form.Control
-                        className="mt-3"
+                    <input
+                        className="mt-3 text-myDark rounded-[15px] py-2 px-4"
                         placeholder="Введите ваш пароль..."
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
                     />
-                    <Row className="d-flex justify-content-between mt-3 pl-3 pr-3">
-                        {isLogin ? (
-                            <div>
-                                Нет аккаунта?{" "}
-                                <NavLink to={REGISTRATION_ROUTE}>
-                                    Зарегистрируйся!
-                                </NavLink>
-                            </div>
-                        ) : (
-                            <div>
-                                Есть аккаунт?{" "}
-                                <NavLink to={LOGIN_ROUTE}>Войдите!</NavLink>
-                            </div>
-                        )}
-                        <Button variant={"outline-success"} onClick={click}>
+                    <div className="d-flex justify-content-between mt-4 pl-3 pr-3">
+                        <div className="flex items-end">
+                            {isLogin ? (
+                                <div>
+                                    Нет аккаунта?{" "}
+                                    <NavLink to={REGISTRATION_ROUTE}>
+                                        Зарегестрируйтесь!
+                                    </NavLink>
+                                </div>
+                            ) : (
+                                <div>
+                                    Есть аккаунт?{" "}
+                                    <NavLink to={LOGIN_ROUTE}>Войдите!</NavLink>
+                                </div>
+                            )}
+                        </div>
+
+                        <button className="auth-btn" onClick={click}>
                             {isLogin ? "Войти" : "Регистрация"}
-                        </Button>
-                    </Row>
-                </Form>
-            </Card>
-        </Container>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 });
 

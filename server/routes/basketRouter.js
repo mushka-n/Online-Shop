@@ -3,7 +3,7 @@ const basketController = require("../controllers/basketController");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = new Router();
 
-router.post("/create", authMiddleware, basketController.createBasket);
+router.post("/create", basketController.createBasket);
 
 router.get("/", authMiddleware, basketController.getBasketProducts);
 

@@ -1,60 +1,58 @@
 const { Type } = require("../models/models");
-const ApiError = require("../error/ApiError");
+const imgService = require("./services/imgService");
 
 class TypeController {
-    async create(req, res) {
-        const { name } = req.body;
-        const type = await Type.create({ name });
-        return res.json(type);
+    async create(req, res, next) {
+        try {
+            const { name } = req.body;
+            const { icon } = req.files;
+
+            const fileName = imgService.addImg(icon, ".png");
+            await Type.create({ name, icon: fileName });
+
+            return res.sendStatus(200);
+        } catch (e) {
+            next(e);
+        }
     }
 
-    async getAll(req, res) {
-        const types = await Type.findAll();
-        return res.json(types);
+    async getAll(req, res, next) {
+        try {
+            const types = await Type.findAll();
+            return res.json(types);
+        } catch (e) {
+            next(e);
+        }
     }
 
-    async updateOne(req, res) {
-        const id = req.params.id;
-        await Type.update(req.body, { where: { id: id } })
-            .then((num) => {
-                if (num == 1) {
-                    res.send({
-                        message: "Type was updated successfully!",
-                    });
-                } else {
-                    res.send({
-                        message: `Cannot update Type with id = ${id}. Maybe Type was not found!`,
-                    });
-                }
-            })
-            .catch(() => {
-                res.status(500).send({
-                    message: "Could not update Type with id = " + id,
-                });
-            });
+    async updateOne(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { name } = req.body;
+
+            const type = await Type.findOne({ where: { id } });
+            if (req.files) {
+                const { icon } = req.files;
+                imgService.updateImg(icon, type.icon);
+            }
+
+            await type.update({ name });
+            return res.sendStatus(200);
+        } catch (e) {
+            next(e);
+        }
     }
 
     async deleteOne(req, res) {
-        const { id } = req.params;
-        await Type.destroy({
-            where: { id: id },
-        })
-            .then((num) => {
-                if (num == 1) {
-                    res.send({
-                        message: "Type was deleted successfully!",
-                    });
-                } else {
-                    res.send({
-                        message: `Cannot delete Type with id = ${id}. Maybe Type was not found!`,
-                    });
-                }
-            })
-            .catch(() => {
-                res.status(500).send({
-                    message: "Could not delete Type with id = " + id,
-                });
-            });
+        try {
+            const { id } = req.params;
+            const type = await Type.findOne({ where: { id } });
+            imgService.deleteImg(type.icon);
+            await type.destroy();
+            return res.sendStatus(200);
+        } catch (e) {
+            next(e);
+        }
     }
 }
 
