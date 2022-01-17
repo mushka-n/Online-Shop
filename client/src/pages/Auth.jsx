@@ -55,7 +55,7 @@ const Auth = observer(() => {
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
                     />
-                    <div className="d-flex justify-content-between mt-4 pl-3 pr-3">
+                    <div className="d-flex justify-content-between mt-4">
                         <div className="flex items-end">
                             {isLogin ? (
                                 <div>
@@ -72,7 +72,14 @@ const Auth = observer(() => {
                             )}
                         </div>
 
-                        <button className="auth-btn" onClick={click}>
+                        <button
+                            className="
+                                py-[15px] px-[30px] font-bold bg-myLight text-myDark rounded-full border-4 border-myDark;
+                                hover:bg-myDark hover:text-myLight hover:border-myLight;
+                                transition ease-in duration-200
+                            "
+                            onClick={click}
+                        >
                             {isLogin ? "Войти" : "Регистрация"}
                         </button>
                     </div>
