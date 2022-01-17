@@ -1,7 +1,6 @@
 /client/node_modules
 /server/node_modules
 
-/server/static/*
 
-#/client/.env
-/server/.env
+/server/static/*
+!/server/static/.gitkeep 
