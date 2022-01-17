@@ -1,5 +1,8 @@
 # Online shop web app
-Developed mostly for self-educating and practice properties
+Developed mostly for self-educating and practice purposes
+
+## [Figma project](https://www.figma.com/file/jSuaikIMKjjPxHMemDjNsX/Parilnya)
+
 
 ## Development stack
 **Frontend** - React.js, MobX, Tailwind CSS  
@@ -13,7 +16,7 @@ cd client
 npm start
 ```
 ### Server side
-Before starting a development server change `/server/.env` file if needed  
+Before starting a development server change `/server/.env` file if needed.  
 `SMTP` data fields for sending emails can stay unprovided.
 ```
 cd server
