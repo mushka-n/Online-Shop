@@ -1,8 +1,8 @@
 /client/node_modules
 /server/node_modules
 
-/server/static/*
-!/server/static/.gitkeep 
+server/static/*.png
+server/static/*.jpg
 
 #/client/.env
 #/server/.env 
