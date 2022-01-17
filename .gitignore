@@ -1,8 +1,7 @@
 /client/node_modules
 /server/node_modules
 
-server/static/*.png
-server/static/*.jpg
+
 
 #/client/.env
 #/server/.env 
