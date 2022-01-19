@@ -9,8 +9,8 @@ Developed mostly for self-educating and practice purposes
 **Backend** - Node.js, Express, PostgreSQL, Sequelize
 
 **Other Packages**:
-jsonwebtoken - for authentification, verification and session-like user experience
-react-palette - for extracting vibrant colors from images
+jsonwebtoken - for authentification, verification and session-like user experience  
+react-palette - for extracting vibrant colors from images  
 
 ## Using this app
 
