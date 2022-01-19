@@ -8,8 +8,8 @@ Developed mostly for self-educating and practice purposes
 **Frontend** - React.js, MobX, Tailwind CSS  
 **Backend** - Node.js, Express, PostgreSQL, Sequelize
 
-**Other Packages**:
-jsonwebtoken - for authentification, verification and session-like user experience  
+**Other Packages**:  
+jsonwebtoken - for authentification, verification and session-like user experience   
 react-palette - for extracting vibrant colors from images  
 
 ## Using this app
