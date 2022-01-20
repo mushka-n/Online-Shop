@@ -5,11 +5,12 @@ Developed mostly for self-educating and practice purposes
 
 
 ## Development stack
-**Frontend** - React.js, MobX, Tailwind CSS  
+**Frontend** - React.js, MobX, axios, Tailwind CSS  
 **Backend** - Node.js, Express, PostgreSQL, Sequelize
 
 **Other Packages**:  
-jsonwebtoken - for authentification, verification and session-like user experience   
+Nodemailer - for sending emails to users  
+JsonWebToken - for authentification, verification and session-like user experience   
 react-palette - for extracting vibrant colors from images  
 
 ## Using this app
